@@ -27,6 +27,19 @@ User Input → LLM (conversation) → Tool Call → Deterministic Validation →
 - ✅ Flag capture: Validated with regex matching against actual machine state
 - ✅ Machine checking: Direct SSH/CLI commands, deterministic output parsing
 
+## 🔗 SecGen Integration
+
+This overlay is designed to integrate with **SecGen** (Security Scenario Generator):
+
+- ✅ **SecGen datastore access** - Read randomized IPs, credentials, flags
+- ✅ **Deterministic validation** - Compatible with SecGen's security model
+- ✅ **Low maintenance** - ~10 hours/year vs 40+ hours for Ruby Hackerbot
+- ✅ **No fork required** - ZeroClaw is a dependency
+
+**See**: [`docs/SECGN_INTEGRATION.md`](docs/SECGN_INTEGRATION.md) for complete integration guide.
+
+**SecGen Documentation**: [`SecGen/docs/ZEROCLOW_INTEGRATION.md`](../SecGen/docs/ZEROCLOW_INTEGRATION.md)
+
 ## 🚀 Quick Start
 
 ### Prerequisites
