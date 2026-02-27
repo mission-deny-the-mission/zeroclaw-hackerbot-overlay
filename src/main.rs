@@ -50,13 +50,25 @@ async fn main() -> Result<()> {
     let config = load_config(&args)?;
     tracing::info!("Configuration loaded from {:?}", args.config);
 
-    // Initialize ZeroClaw with Hackerbot tools
-    let mut additional_tools = init_tools();
-    tracing::info!("Loaded {} Hackerbot tools", additional_tools.len());
+    // Initialize Hackerbot tools
+    let tools = init_tools(config.secgen_datastore_path.as_deref());
+    tracing::info!("Loaded {} Hackerbot tools", tools.len());
 
-    // Start ZeroClaw channel server with our tools
-    // This delegates to ZeroClaw's channel start logic
-    start_channel_server(config, &mut additional_tools).await?;
+    // Log tool names
+    for tool in &tools {
+        tracing::info!("  - Tool: {}", tool.name());
+    }
+
+    tracing::info!("");
+    tracing::info!("Hackerbot tools initialized successfully!");
+    tracing::info!("");
+    tracing::info!("NOTE: This overlay provides tools for ZeroClaw.");
+    tracing::info!("To use these tools, start ZeroClaw with the --config option");
+    tracing::info!("pointing to your hackerbot.toml configuration file.");
+    tracing::info!("");
+    tracing::info!("Example:");
+    tracing::info!("  zeroclaw channel start --config ~/.zeroclaw/hackerbot.toml");
+    tracing::info!("");
 
     Ok(())
 }
@@ -72,6 +84,7 @@ fn load_config(args: &Args) -> Result<Config> {
         toml::from_str(&content)?
     } else {
         // Use defaults
+        tracing::warn!("Config file not found at {:?}, using defaults", config_path);
         Config::default()
     };
 
@@ -81,75 +94,6 @@ fn load_config(args: &Args) -> Result<Config> {
         irc_port: args.irc_port,
         ..config
     })
-}
-
-/// Start the IRC channel server
-async fn start_channel_server(config: Config, tools: &mut Vec<Box<dyn zeroclaw::tools::Tool>>) -> Result<()> {
-    use zeroclaw::channels::irc::{IrcChannel, IrcChannelConfig};
-    use zeroclaw::channels::Channel;
-    use tokio::sync::mpsc;
-
-    tracing::info!("Connecting to IRC server {}:{}", config.irc_server, config.irc_port);
-
-    // Create IRC channel
-    let irc_config = IrcChannelConfig {
-        server: config.irc_server.clone(),
-        port: config.irc_port,
-        nickname: config.irc_nickname,
-        username: Some(config.irc_nickname.clone()),
-        channels: vec![config.irc_channel.clone()],
-        allowed_users: config.allowed_users.clone(),
-        server_password: None,
-        nickserv_password: None,
-        sasl_password: None,
-        verify_tls: false, // Accept self-signed certs for local testing
-    };
-
-    let irc_channel = IrcChannel::new(irc_config);
-
-    // Create message channel
-    let (tx, mut rx) = mpsc::channel(100);
-
-    // Start listening for messages
-    let listen_handle = tokio::spawn(async move {
-        tracing::info!("IRC channel listening for messages...");
-        
-        // This would normally integrate with ZeroClaw's agent loop
-        // For now, we'll just log received messages
-        while let Some(msg) = rx.recv().await {
-            tracing::info!("Received message from {}: {}", msg.sender, msg.content);
-            
-            // Process message with LLM + tools
-            // This is where ZeroClaw's agent loop would be invoked
-            process_message(msg, tools).await?;
-        }
-
-        Ok::<(), anyhow::Error>(())
-    });
-
-    // Start IRC connection
-    irc_channel.listen(tx).await?;
-
-    // Wait for listener
-    listen_handle.await??;
-
-    Ok(())
-}
-
-/// Process a message with the LLM and tools
-async fn process_message(
-    msg: zeroclaw::channels::ChannelMessage,
-    tools: &[Box<dyn zeroclaw::tools::Tool>],
-) -> Result<()> {
-    // This is where ZeroClaw's agent loop would be invoked
-    // For the overlay, we delegate to ZeroClaw's agent processing
-    
-    tracing::debug!("Processing message: {:?}", msg);
-    
-    // Tool selection and execution would happen here via ZeroClaw's agent
-    // The tools are registered and available for the LLM to call
-    
-    Ok(())
 }
 
 /// Configuration structure

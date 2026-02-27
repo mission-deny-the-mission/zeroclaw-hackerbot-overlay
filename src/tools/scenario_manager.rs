@@ -98,7 +98,7 @@ impl ScenarioManagerTool {
         output
     }
 
-    fn goto_scenario(&self, user: &str, index: usize) -> anyhow::Result<String> {
+    fn goto_scenario(&self, _user: &str, index: usize) -> anyhow::Result<String> {
         if index == 0 || index > self.scenarios.len() {
             anyhow::bail!(
                 "Invalid scenario number. Must be between 1 and {}",

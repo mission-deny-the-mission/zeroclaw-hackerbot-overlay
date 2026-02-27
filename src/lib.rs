@@ -17,11 +17,11 @@ pub use tools::{
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// Initialize all Hackerbot tools
-pub fn init_tools() -> Vec<Box<dyn zeroclaw::tools::Tool>> {
+pub fn init_tools(secgen_datastore_path: Option<&str>) -> Vec<Box<dyn zeroclaw::tools::Tool>> {
     vec![
         Box::new(QuizValidatorTool::new()),
         Box::new(FlagValidatorTool::new()),
-        Box::new(ScenarioManagerTool::new(None)),
-        Box::new(SecGenDatastoreTool::new(None)),
+        Box::new(ScenarioManagerTool::new()),
+        Box::new(SecGenDatastoreTool::new(secgen_datastore_path)),
     ]
 }
