@@ -2,7 +2,10 @@
 //!
 //! This tool verifies flag capture from student machines using direct SSH/CLI commands.
 //! **NOT vulnerable to prompt injection** - executes deterministic code with regex validation.
+//!
+//! SECURITY: Flag encryption and verification requirements based on security level.
 
+use crate::security::SecurityConfig;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -15,23 +18,28 @@ pub struct FlagValidatorTool {
     timeout_secs: u64,
     /// Default flag path pattern
     default_flag_path: String,
+    /// Security configuration
+    security: SecurityConfig,
 }
 
 /// Flag validation result
+/// SECURITY NOTE: Does NOT include flag_value to prevent LLM leakage
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FlagResult {
     pub captured: bool,
-    pub flag_value: String,
+    // SECURITY: Never include flag_value here - LLM could leak it via prompt injection
+    // pub flag_value: String,  ← REMOVED FOR SECURITY
     pub message: String,
     pub timestamp: DateTime<Utc>,
     pub target_ip: String,
 }
 
 impl FlagValidatorTool {
-    pub fn new() -> Self {
+    pub fn new(security: SecurityConfig) -> Self {
         Self {
             timeout_secs: 30,
             default_flag_path: "/root/flag.txt".to_string(),
+            security,
         }
     }
 
@@ -67,17 +75,15 @@ impl FlagValidatorTool {
             flag_regex.is_match(&flag_content)
         };
 
-        let message = if captured {
-            "Flag successfully captured!".to_string()
-        } else {
-            format!("Flag not found or invalid format. Content: {}", 
-                   if flag_content.is_empty() { "(empty)" } else { "(see logs)" })
-        };
-
         Ok(FlagResult {
             captured,
-            flag_value: if captured { flag_content } else { String::new() },
-            message,
+            // SECURITY: Never return flag_value - could be leaked via prompt injection
+            // flag_value: if captured { flag_content } else { String::new() },  ← REMOVED
+            message: if captured {
+                "Flag successfully captured!".to_string()
+            } else {
+                format!("Flag not found or invalid format.")  // ← Don't reveal what was found
+            },
             timestamp: Utc::now(),
             target_ip: target_ip.to_string(),
         })
@@ -125,7 +131,7 @@ pub struct CommandResult {
 
 impl Default for FlagValidatorTool {
     fn default() -> Self {
-        Self::new()
+        Self::new(SecurityConfig::default())
     }
 }
 
@@ -176,9 +182,8 @@ impl zeroclaw::tools::Tool for FlagValidatorTool {
         Ok(zeroclaw::tools::ToolResult {
             success: result.captured,
             output: format!(
-                "{}\nFlag: {} | Time: {}",
+                "{} | Time: {}",
                 result.message,
-                if result.flag_value.is_empty() { "(not captured)" } else { &result.flag_value },
                 result.timestamp.format("%Y-%m-%d %H:%M:%S UTC")
             ),
             error: None,

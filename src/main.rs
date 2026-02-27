@@ -7,7 +7,7 @@ use clap::Parser;
 use std::path::PathBuf;
 use tracing_subscriber::{fmt, EnvFilter};
 
-use zeroclaw_hackerbot::{init_tools, VERSION};
+use zeroclaw_hackerbot::{init_tools, SecurityConfig, VERSION};
 
 /// ZeroClaw Hackerbot - Cybersecurity Training Bot
 #[derive(Parser, Debug)]
@@ -50,8 +50,12 @@ async fn main() -> Result<()> {
     let config = load_config(&args)?;
     tracing::info!("Configuration loaded from {:?}", args.config);
 
+    // Validate security configuration
+    config.security.validate().map_err(|e| anyhow::anyhow!("Security config error: {}", e))?;
+    tracing::info!("Security level: {:?}", config.security.level);
+
     // Initialize Hackerbot tools
-    let tools = init_tools(config.secgen_datastore_path.as_deref());
+    let tools = init_tools(config.secgen_datastore_path.as_deref(), &config.security);
     tracing::info!("Loaded {} Hackerbot tools", tools.len());
 
     // Log tool names
@@ -101,30 +105,33 @@ fn load_config(args: &Args) -> Result<Config> {
 struct Config {
     #[serde(default = "default_irc_server")]
     irc_server: String,
-    
+
     #[serde(default = "default_irc_port")]
     irc_port: u16,
-    
+
     #[serde(default = "default_irc_nickname")]
     irc_nickname: String,
-    
+
     #[serde(default = "default_irc_channel")]
     irc_channel: String,
-    
+
     #[serde(default)]
     allowed_users: Vec<String>,
-    
+
     #[serde(default)]
     secgen_datastore_path: Option<String>,
-    
+
     #[serde(default)]
     ollama_host: String,
-    
+
     #[serde(default)]
     ollama_port: u16,
-    
+
     #[serde(default = "default_model")]
     model: String,
+
+    #[serde(default)]
+    security: SecurityConfig,
 }
 
 impl Default for Config {
@@ -139,6 +146,7 @@ impl Default for Config {
             ollama_host: "localhost".to_string(),
             ollama_port: 11434,
             model: default_model(),
+            security: SecurityConfig::default(),
         }
     }
 }

@@ -2,23 +2,30 @@
 //!
 //! This tool provides read-only access to SecGen datastore for accessing
 //! randomized IPs, credentials, flags, and other scenario data.
+//!
+//! SECURITY: Flag queries are blocked based on security configuration.
 
+use crate::security::SecurityConfig;
 use async_trait::async_trait;
 use serde_json::json;
 use std::collections::HashMap;
 use std::path::PathBuf;
+use std::sync::Arc;
+use parking_lot::RwLock;
 
 /// SecGen datastore access tool
 pub struct SecGenDatastoreTool {
     datastore_path: Option<PathBuf>,
-    cache: std::sync::RwLock<HashMap<String, serde_json::Value>>,
+    cache: Arc<RwLock<HashMap<String, serde_json::Value>>>,
+    security: SecurityConfig,
 }
 
 impl SecGenDatastoreTool {
-    pub fn new(datastore_path: Option<&str>) -> Self {
+    pub fn new(datastore_path: Option<&str>, security: SecurityConfig) -> Self {
         Self {
             datastore_path: datastore_path.map(PathBuf::from),
-            cache: std::sync::RwLock::new(HashMap::new()),
+            cache: Arc::new(RwLock::new(HashMap::new())),
+            security,
         }
     }
 
@@ -29,9 +36,21 @@ impl SecGenDatastoreTool {
         index: Option<usize>,
         field: Option<&str>,
     ) -> anyhow::Result<serde_json::Value> {
+        // SECURITY: NEVER allow flag queries through this tool (unless security level allows)
+        // Flags must be captured through challenges, not queried
+        if self.security.block_datastore_queries() {
+            if key.eq_ignore_ascii_case("flags") || 
+               key.to_lowercase().contains("flag") {
+                anyhow::bail!(
+                    "Flag access not permitted through datastore queries. \
+                     Flags must be captured by completing challenges on student machines."
+                );
+            }
+        }
+
         // Try cache first
         {
-            let cache = self.cache.read().map_err(|_| anyhow::anyhow!("Cache lock poisoned"))?;
+            let cache = self.cache.read();
             if let Some(cached) = cache.get(key) {
                 return Ok(cached.clone());
             }
@@ -91,7 +110,7 @@ impl SecGenDatastoreTool {
 
         // Cache result
         {
-            let mut cache = self.cache.write().map_err(|_| anyhow::anyhow!("Cache lock poisoned"))?;
+            let mut cache = self.cache.write();
             cache.insert(key.to_string(), result.clone());
         }
 
@@ -112,7 +131,7 @@ impl SecGenDatastoreTool {
 
 impl Default for SecGenDatastoreTool {
     fn default() -> Self {
-        Self::new(None)
+        Self::new(None, SecurityConfig::default())
     }
 }
 
@@ -214,7 +233,7 @@ mod tests {
             "flags": ["SEC GEN{flag1}"]
         }"#);
 
-        let tool = SecGenDatastoreTool::new(Some(path.to_str().unwrap()));
+        let tool = SecGenDatastoreTool::new(Some(path.to_str().unwrap()), SecurityConfig::default());
         
         let result = tool.query("IP_addresses", Some(0), None).unwrap();
         assert_eq!(result.as_str().unwrap(), "172.16.0.2");
@@ -227,7 +246,7 @@ mod tests {
             "accounts": [{"username": "student1", "password": "pass123"}]
         }"#);
 
-        let tool = SecGenDatastoreTool::new(Some(path.to_str().unwrap()));
+        let tool = SecGenDatastoreTool::new(Some(path.to_str().unwrap()), SecurityConfig::default());
         
         let result = tool.query("accounts", Some(0), Some("username")).unwrap();
         assert_eq!(result.as_str().unwrap(), "student1");
@@ -242,7 +261,7 @@ mod tests {
             "flags": []
         }"#);
 
-        let tool = SecGenDatastoreTool::new(Some(path.to_str().unwrap()));
+        let tool = SecGenDatastoreTool::new(Some(path.to_str().unwrap()), SecurityConfig::default());
         let keys = tool.list_keys().unwrap();
         
         assert!(keys.contains(&"IP_addresses".to_string()));
