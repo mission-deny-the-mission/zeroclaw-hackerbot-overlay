@@ -1,0 +1,42 @@
+# ZeroClaw Hackerbot Overlay - Git Ignore
+
+# Build artifacts
+/target/
+**/target/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Config (keep default, not personal)
+config/hackerbot.toml
+!config/hackerbot-default.toml
+
+# Test artifacts
+test/*.db
+test/*.db-shm
+test/*.db-wal
+
+# Binary releases
+*.bin
+*.exe
+
+# Coverage
+*.gcno
+*.gcda
+coverage/
+tarpaulin-report.html
+
+# Dependencies
+Cargo.lock

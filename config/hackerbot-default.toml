@@ -1,0 +1,60 @@
+# ZeroClaw Hackerbot Configuration
+# Copy to ~/.zeroclaw/hackerbot.toml and customize
+
+# ─────────────────────────────────────────────────────────────────────────────
+# IRC Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+[irc]
+server = "localhost"
+port = 6697                    # TLS port (ZeroClaw requires TLS)
+channel = "#hackerbot"
+nickname = "Hackerbot"
+verify_tls = false             # Set true for production with valid certs
+
+# Allowlist for users (use "*" for all)
+allowed_users = ["*"]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SecGen Integration
+# ─────────────────────────────────────────────────────────────────────────────
+
+[secgen]
+datastore_path = "/var/lib/secgen/datastore.json"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LLM Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+[ollama]
+host = "localhost"
+port = 11434
+model = "qwen3-vl:8b"          # Or your preferred model
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Tool Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+[tools.quiz_validator]
+enabled = true
+similarity_threshold = 0.8     # Minimum similarity for fuzzy match
+max_edit_distance = 3          # Maximum Levenshtein distance
+
+[tools.flag_validator]
+enabled = true
+timeout_secs = 30
+default_flag_path = "/root/flag.txt"
+
+[tools.scenario_manager]
+enabled = true
+
+[tools.secgen_datastore]
+enabled = true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Logging
+# ─────────────────────────────────────────────────────────────────────────────
+
+[logging]
+level = "info"                 # debug, info, warn, error
+file = "/var/log/zeroclaw-hackerbot/hackerbot.log"
