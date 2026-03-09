@@ -235,7 +235,7 @@ Monitor for:
 cargo update zeroclaw --dry-run
 
 # Check ZeroClaw changelog
-# https://github.com/openagen/zeroclaw/blob/main/CHANGELOG.md
+# https://github.com/zeroclaw-labs/zeroclaw/blob/main/CHANGELOG.md
 
 # Fix compiler errors
 # (Compiler will tell you exactly what broke)
@@ -297,8 +297,8 @@ jq . /var/lib/secgen/datastore.json
 ## 🆘 Getting Help
 
 ### Resources
-- **ZeroClaw Docs**: https://github.com/openagen/zeroclaw/tree/main/docs
-- **ZeroClaw Issues**: https://github.com/openagen/zeroclaw/issues
+- **ZeroClaw Docs**: https://github.com/zeroclaw-labs/zeroclaw/tree/main/docs
+- **ZeroClaw Issues**: https://github.com/zeroclaw-labs/zeroclaw/issues
 - **This Overlay Issues**: [Your repo issues]
 
 ### When to Open Issue

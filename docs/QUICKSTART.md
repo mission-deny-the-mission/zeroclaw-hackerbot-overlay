@@ -155,7 +155,7 @@ grep datastore_path ~/.zeroclaw/hackerbot.toml
 
 - **Issues**: [GitHub Issues](https://github.com/mission-deny-the-mission/zeroclaw-hackerbot-overlay/issues)
 - **Docs**: `docs/` directory
-- **ZeroClaw**: https://github.com/openagen/zeroclaw
+- **ZeroClaw**: https://github.com/zeroclaw-labs/zeroclaw
 
 ---
 

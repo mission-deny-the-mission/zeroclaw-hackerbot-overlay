@@ -2,7 +2,7 @@
 
 **Cybersecurity training bot for ZeroClaw - SecGen Hackerbot replacement**
 
-This is an **overlay/plugin** for [ZeroClaw](https://github.com/openagen/zeroclaw) that adds cybersecurity training capabilities. **No fork required!**
+This is an **overlay/plugin** for [ZeroClaw](https://github.com/zeroclaw-labs/zeroclaw) that adds cybersecurity training capabilities. **No fork required!**
 
 ## 🎯 Features
 
@@ -277,7 +277,7 @@ GPL-3.0 (compatible with SecGen and ZeroClaw)
 
 ## 🙏 Acknowledgments
 
-- [ZeroClaw](https://github.com/openagen/zeroclaw) - AI agent platform
+- [ZeroClaw](https://github.com/zeroclaw-labs/zeroclaw) - AI agent platform
 - [SecGen](https://github.com/cliffe/SecGen) - Original Hackerbot
 - [Hacktivity](https://hacktivity.co.uk/) - Cybersecurity training platform
 

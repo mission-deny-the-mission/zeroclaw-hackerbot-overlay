@@ -199,7 +199,7 @@ cargo build --release
 
 - **Repository**: https://github.com/mission-deny-the-mission/zeroclaw-hackerbot-overlay
 - **Issues**: [GitHub Issues](https://github.com/mission-deny-the-mission/zeroclaw-hackerbot-overlay/issues)
-- **ZeroClaw**: https://github.com/openagen/zeroclaw
+- **ZeroClaw**: https://github.com/zeroclaw-labs/zeroclaw
 - **SecGen**: https://github.com/cliffe/SecGen
 
 ---

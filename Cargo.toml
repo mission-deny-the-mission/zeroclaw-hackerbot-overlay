@@ -11,7 +11,7 @@ categories = ["command-line-utilities"]
 
 [dependencies]
 # ZeroClaw as a library dependency (NO FORK REQUIRED!)
-zeroclaw = { git = "https://github.com/openagen/zeroclaw.git", branch = "main" }
+zeroclaw = { git = "https://github.com/zeroclaw-labs/zeroclaw.git", branch = "main" }
 
 # Async runtime
 tokio = { version = "1.42", features = ["full"] }

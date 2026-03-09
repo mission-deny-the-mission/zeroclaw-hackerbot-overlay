@@ -268,7 +268,7 @@ tracing::info!("Tool called: {} by user: {}", tool_name, user);
 
 ## 📚 References
 
-- [ZeroClaw Security Model](https://github.com/openagen/zeroclaw/tree/main/docs/security)
+- [ZeroClaw Security Model](https://github.com/zeroclaw-labs/zeroclaw/tree/main/docs/security)
 - [SecGen Security](https://github.com/cliffe/SecGen/blob/master/README.md)
 - [Rust Security Guidelines](https://rust-lang.github.io/rust-clippy/master/index.html)
 

@@ -409,7 +409,7 @@ grep "quiz_validator" /var/log/zeroclaw-hackerbot/hackerbot.log
 ## 📚 Additional Resources
 
 - **Overlay Repository**: https://github.com/mission-deny-the-mission/zeroclaw-hackerbot-overlay
-- **ZeroClaw Documentation**: https://github.com/openagen/zeroclaw/tree/main/docs
+- **ZeroClaw Documentation**: https://github.com/zeroclaw-labs/zeroclaw/tree/main/docs
 - **SecGen Documentation**: https://github.com/cliffe/SecGen/blob/master/README.md
 - **Hacktivity Platform**: https://hacktivity.co.uk/
 
